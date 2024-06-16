@@ -157,7 +157,7 @@ class _LineChartSample2AllState extends State<LineChartSample2All> {
             getTooltipItems: (List<LineBarSpot> barSpots) {
               return barSpots.map((e) {
                 return LineTooltipItem(
-                  formatCurrency(e.y),
+                  "${widget.homeController.listSymbols[e.barIndex]} - ${formatCurrency(e.y)}",
                   const TextStyle(
                     color: Colors.grey,
                     fontSize: 14,

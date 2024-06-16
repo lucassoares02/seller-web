@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:appwrite/models.dart';
 import 'package:profair/src/models/active_model.dart';
 import 'package:profair/src/models/details_walllet.dart';
@@ -15,6 +17,7 @@ class HomeController extends ValueNotifier<StateApp> {
   List<List<DataLineGraph>> historicListAll = [];
   double maxValue = 0;
   bool valueDropSelected = true;
+  List<String> listSymbols = [];
 
   final stateActives = ValueNotifier<StateApp>(StateApp.start);
   final stateDetails = ValueNotifier<StateApp>(StateApp.start);
@@ -71,9 +74,11 @@ class HomeController extends ValueNotifier<StateApp> {
     historicListAll = [];
     try {
       historicAll = await _homeRepository.getHistoricAllActions(active);
+      inspect(historicAll);
       historicAll!.sort((a, b) => a.id!.compareTo(b.id!));
       List<DataLineGraph> a = [];
       for (var i = 0; i < historicAll!.length; i++) {
+        if (!listSymbols.contains(historicAll![i].symbol!)) listSymbols.add(historicAll![i].symbol!);
         if (i != 0 && historicAll![i].id == a[0].id) {
           a.add(
             DataLineGraph(
@@ -98,6 +103,8 @@ class HomeController extends ValueNotifier<StateApp> {
           ));
         }
       }
+      print("listSymbols");
+      print(listSymbols);
       stateHistoricAll.value = StateApp.success;
     } catch (e) {
       print("Find Historic All Actions (Home Controller) Error: $e");

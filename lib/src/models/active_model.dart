@@ -27,7 +27,7 @@ class ActiveModel {
     valorAtivo = json['valorAtivo'];
     investimento = json['investimento'];
     renda = json['renda'];
-    valorizacao = (json['valorizacao'] * -1);
+    valorizacao = json['valorizacao'];
     dataHora = json['dataHora'];
   }
 
