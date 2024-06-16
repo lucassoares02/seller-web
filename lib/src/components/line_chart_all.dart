@@ -153,11 +153,12 @@ class _LineChartSample2AllState extends State<LineChartSample2All> {
     return LineChartData(
       lineTouchData: LineTouchData(
         touchTooltipData: LineTouchTooltipData(
+            maxContentWidth: 500,
             tooltipBgColor: Colors.white,
             getTooltipItems: (List<LineBarSpot> barSpots) {
               return barSpots.map((e) {
                 return LineTooltipItem(
-                  "${widget.homeController.listSymbols[e.barIndex]} - ${formatCurrency(e.y)}",
+                  "${widget.homeController.listSymbols[e.barIndex]} - ${e.x} - ${formatCurrency(e.y)}",
                   const TextStyle(
                     color: Colors.grey,
                     fontSize: 14,
