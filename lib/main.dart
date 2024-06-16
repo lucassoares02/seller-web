@@ -1,8 +1,6 @@
 // ignore_for_file: depend_on_referenced_packages
 
-import 'package:profair/provider/appwriter.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-
 import 'package:profair/src/notification/notification_service.dart';
 import 'package:profair/src/router/router.dart';
 import 'package:profair/src/shared/themes/themes.dart';
@@ -23,8 +21,7 @@ void main() {
         Provider<NotificationService>(
           create: (context) => NotificationService(),
         ),
-        Provider<HomeController>(create: (context) => HomeController(StateApp.start, HomeRepository())),
-        Provider<AppWrite>(create: (context) => AppWrite())
+        Provider<HomeController>(create: (context) => HomeController(StateApp.start, HomeRepository()))
       ],
       child: MyApp(),
     ),
@@ -42,14 +39,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    AppWrite appWrite = Provider.of<AppWrite>(context, listen: false);
-
-    appWrite.initAppWrite();
-    // Modular.setInitialRoute('/splash');
-
     return MaterialApp.router(
       scrollBehavior: MyCustomScrollBehavior(),
-      title: "profair",
+      title: "G6Bank",
       routerConfig: _appRouter.config(),
       localizationsDelegates: const [
         GlobalWidgetsLocalizations.delegate,

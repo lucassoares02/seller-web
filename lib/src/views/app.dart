@@ -20,7 +20,7 @@ class _AppState extends State<App> {
   @override
   void initState() {
     homeController = Provider.of<HomeController>(context, listen: false);
-    homeController!.findData();
+    homeController!.findActives();
     super.initState();
   }
 
@@ -33,8 +33,17 @@ class _AppState extends State<App> {
         child: Row(
           children: [
             SideMenu(
-              homeController: homeController!,
-              // action: () => openDrawer.value = !openDrawer.value,
+              action: () => openDrawer.value = !openDrawer.value,
+            ),
+            ValueListenableBuilder(
+              valueListenable: openDrawer,
+              builder: (context, bool value, child) {
+                return SizedBox(
+                  width: width * ((value || Responsive.isTablet(context)) ? 0.85 : 0.96),
+                  // width: double.infinity  ,
+                  child: const AutoRouter(),
+                );
+              },
             ),
             const Expanded(
               child: SizedBox(
@@ -44,16 +53,7 @@ class _AppState extends State<App> {
                   child: AutoRouter(),
                 ),
               ),
-            )
-            // ValueListenableBuilder(
-            //     valueListenable: openDrawer,
-            //     builder: (context, bool value, child) {
-            //       return SizedBox(
-            //         width: width * ((value || Responsive.isTablet(context)) ? 0.85 : 0.96),
-            //         // width: double.infinity  ,
-            //         child: const AutoRouter(),
-            //       );
-            //     })
+            ),
           ],
         ),
       ),

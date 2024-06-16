@@ -1,177 +1,77 @@
-import 'package:profair/src/models/graph_clients.dart';
-import 'package:profair/src/models/login_model.dart';
-import 'package:profair/src/models/value_minute_graph.dart';
-import 'package:profair/src/repositories/buyers_model.dart';
-import 'package:profair/src/repositories/categories_icon.dart';
-import 'package:profair/src/repositories/categories_model.dart';
-import 'package:profair/src/repositories/information_model.dart';
-import 'package:profair/src/repositories/notice_model.dart';
-import 'package:profair/src/repositories/recipe_model.dart';
-import 'package:profair/src/repositories/requests_stores_model.dart';
+import 'package:profair/src/models/active_model.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
+import 'package:profair/src/models/details_walllet.dart';
+import 'package:profair/src/models/value_minute_graph.dart';
 
 class HomeRepository {
   final Dio clientDio = Dio();
-  final String url = "https://profair.click/";
 
-  Future getData(Object data) async {
-    clientDio.options.contentType = Headers.formUrlEncodedContentType;
+  Future<List<ActiveModel>?> getActives() async {
+    // clientDio.options.contentType = Headers.formUrlEncodedContentType;
+    clientDio.options.contentType = Headers.jsonContentType;
 
+    Map<String, String> data = {"nomeCarteira": ""};
     try {
-      // final response = await clientDio.post("https://profair.click/getuserweb", data: data);
-      // final response = await clientDio.post("https://profair.click/getuserweb", data: data);
-      final response = await clientDio.post("https://profair.click/getusermore", data: data);
-      print("========================================");
-      print("response.data");
-      print("========================================");
-      print(response.data);
-      print("========================================");
-
-      final item = response.data as List;
-      return item.map((json) => LoginModel.fromJson(json)).toList();
+      // final response = await clientDio.get("https://g6b.online/api/Ativos/rendimento-total-carteira");
+      // final lista = response.data["data"] as List;
+      final list = [
+        {
+          "simbolo": "VALE4",
+          "longname": "Vale S.A.",
+          "ativoId": 1,
+          "valorAtivo": 27.09,
+          "image":
+              "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5OjcBCgoKDQwNGg8PGjclHyU3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3N//AABEIABkAOAMBIgACEQEDEQH/xAAbAAABBAMAAAAAAAAAAAAAAAAABAUGBwECA//EAC4QAAEDAwICCQQDAAAAAAAAAAECAwQABRESMQZBExQhIlFhcXKBMjPBwgeRsf/EABkBAAIDAQAAAAAAAAAAAAAAAAAFAQIDBP/EACERAAICAQMFAQAAAAAAAAAAAAECAAMEQVHBERIhMdEF/9oADAMBAAIRAxEAPwCZfyBxfeeHrmxGixGERXkakSVgrKzzGOwDHzuK68M8d9aKW7ultGrsD7YwB7h+aknE9ijcRWh2BJ7pPeadxktLGyh+fEEiqaiMSYEmTbpyNEmMrStP+EeRGCPI1tWFbwYk/SuycZhah8baS7Zl0Yjt6kkOHlg9n91pZ571wbcccZShsHCFA/V49lVHwsm9369C1w5rrUBnvyVhIV0aPAEg4J2HyeVXC48zbhDjhspZcWGUkbIODjPrjHqRS1KcoXlrXHboBz1+xzj5Nd1AYKQTvxFlFNUi+R48TrTjbnRl9TScDJUEk6l+0BKj6ClqZaVT1xAk6ktJd1csEkfrXZLTq99pftNFIIdzE8SUoZKEN606itJJKVFOwORsd6KIRyqJ8bcMKuvRXC3oHX2RoKcgdM2eRPiCcj5HOnhX1H1rFSCQeomV1S3IUf0Zy4T4fY4dtKYrZC31npJD2PuLO/wNh5CnG4REzojkdSlI1YKVp3QoHKVDzBANI6KiXVQoCj1MrscV1MZt4rUxHYLSGwop3wCSQckkDHyfGhi1Ox3mXGpy9TbCGFFTYOtKSSM+fbWKKJabw7cYCZBS9rbWXF6S2AQVKKt9zuaK0oohP//Z",
+        },
+        {
+          "simbolo": "BBAS3",
+          "longname": "Banco do Brasil SA",
+          "ativoId": 2,
+          "valorAtivo": 27.43,
+          "image":
+              "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAAJCAMAAABQfh8kAAAAmVBMVEX94QD/5wD/6AD/5AD/4wD/5gD/5QD/6gCPjF7ZxDN0d2leZnFbZnLcxzC9r0ajm1XAskQdQH8AAIxlbW48UXrGtkCalFmwpU54emiWklpYY3Pu1R3n0CU2TnvOvDsKOYKDg2QALYUANYNNXHVEV3drcGzhyyunn1P02hYACosnRX59fmaNiF9hanAWPYAAHYgAMYQAKIb/9ABqQcRWAAABJUlEQVQokZWR25KCMAyGm7a0hQJFCoWKKIIcVgEP7/9wW3Vnr7wxk4skk+SffEHoaQwoZehro1xpVAkGGNOPDQRj71N5V4v9oRl4IMOIceo5x8QDghF3qwAg3m4Vx5xiIBwI/K2n07E1XZImfOM3zS4dxs0gdCiEzh6nXg5ZNox6+jHheeoueT3vy8V/TxIol6aLOK+7Y2QudlytuPKqZTeUTes8KlWs2SzGLtLnuN39DzpFu9jtS9H0dXAei6u9kvhA76iebkIpNWqWNqqLT6s/tbaU0QskRbYW/j0GCKTMg0dvfFEIWRS65JfAVGFYJe7GIleyyvu5z40IXpIkSbhakMPmqBJA4FGPecAYuNgljs+TKnO4KAHHzHPB+0by/OO3P/wFxRAW2Ab3lwEAAAAASUVORK5CYII=",
+        },
+      ];
+      return list.map((json) => ActiveModel.fromJson(json)).toList();
     } catch (e) {
-      print("Error getData client: $e");
-      return false;
+      print("Error Home Repository: $e");
     }
   }
 
-  Future<LoginModel> getClient(String id) async {
-    clientDio.options.contentType = Headers.formUrlEncodedContentType;
-
-    final response = await clientDio.get("${url}client/$id");
-
-    final item = response.data[0];
-    return LoginModel.fromJson(item);
-  }
-
-  Future<double> getValueFair() async {
-    clientDio.options.contentType = Headers.formUrlEncodedContentType;
-
-    final response = await clientDio.get("${url}valuefair");
-
-    return response.data[0]["value"] ?? 0;
-  }
-
-  getCategoriesHome() async {
-    final response = await clientDio.post('https://profair-backend.onrender.com/categories');
-    List list = response.data as List;
-    return list.map((json) => CategoriesModel.fromJson(json)).toList();
-  }
-
-  getNotices() async {
-    final response = await clientDio.get('${url}notices');
-    List list = response.data as List;
-    return list.map((json) => NoticeModel.fromJson(json)).toList();
-  }
-
-  getSharedHome() async {
-    final response = await clientDio.get('https://profair-backend.onrender.com/cookbook');
-    List list = response.data as List;
-    return list.map((json) => RecipeModel.fromJson(json)).toList();
-  }
-
-  getLastTradings(int? codeProvider) async {
-    final response = await clientDio.get('${url}requestsprovider/$codeProvider');
-    List list = response.data as List;
-    return list.map((json) => RequestsStoresModel.fromJson(json)).toList();
-  }
-
-  getBuyers() async {
-    final response = await clientDio.get('${url}buyers');
-    print("RESPONES BUYERS");
-    print(response);
-    print("RESPONES BUYERS");
-    List list = response.data as List;
-    return list.map((json) => BuyersModel.fromJson(json)).toList();
-  }
-
-  getCategoriesss(int code) async {
-    List list = [
-      if (code == 1)
-        {
-          "id": 14,
-          "title": 'Novo',
-          "icon": Icons.add_outlined,
-          "route": "selectstore",
-        },
-      if (code == 1)
-        {
-          "id": 34,
-          "title": 'Produtos',
-          "icon": Icons.shopping_basket_rounded,
-          "route": "productsprovider",
-        },
-      if (code == 3)
-        {
-          "id": 54,
-          "title": code == 1 ? 'Clientes' : 'Associados',
-          "icon": Icons.groups_2_sharp,
-          "route": "clients",
-        },
-      if (code == 3 || code == 2)
-        {
-          "id": 64,
-          "title": 'Fornecedores',
-          "icon": Icons.business_rounded,
-          "route": "selectprovider",
-        },
-      if (code == 1)
-        {
-          "id": 84,
-          "title": 'Negociações',
-          "icon": Icons.swap_horiz_rounded,
-          "route": "tradings",
-        },
-      {
-        "id": 84,
-        "title": 'Relatórios',
-        "icon": Icons.show_chart_rounded,
-        "route": "reports",
-      },
-      {
-        "id": 74,
-        "title": 'Dúvidas',
-        "icon": Icons.messenger_outline_outlined,
-        "route": "faq",
-      },
-      {
-        "id": 24,
-        "title": 'Contatos',
-        "icon": Icons.phone,
-        "route": "contacts",
-      },
-    ];
-    return list.map((json) => CategoriesIcon.fromJson(json)).toList();
-  }
-
-  getInformation() async {
+  Future<List<DetailsWallet>?> getResume(bool active) async {
+    clientDio.options.contentType = Headers.jsonContentType;
+    Map<String, String> data = {"nomeCarteira": ""};
     try {
-      final response = await clientDio.get('${url}information');
-      List list = response.data as List;
-      return list.asMap().entries.map((json) => InformationModel.fromJson(json.value, json.key)).toList();
+      print(active);
+      final response = await clientDio.get("https://g6b.online/api/Ativos/contexto-tela-inicial?paridadeRiscos=$active");
+      final list = response.data["data"] as List;
+      return list.map((json) => DetailsWallet.fromJson(json)).toList();
     } catch (e) {
-      print("Error Get Information: $e");
+      print("Error Home Repository: $e");
     }
   }
 
-  getChartClients() async {
+  Future<List<DataLineGraph>?> getHistoric(bool active) async {
+    clientDio.options.contentType = Headers.jsonContentType;
     try {
-      final response = await clientDio.get('${url}storesgraph');
-      List list = response.data["item"] as List;
-      return list.map((json) => GraphClients.fromJson(json)).toList();
+      final response = await clientDio.get("https://g6b.online/api/Ativos/rendimento-diario-carteira?paridadeRiscos=$active");
+      final list = response.data["data"] as List;
+      return list.map((json) => DataLineGraph.fromJson(json)).toList();
     } catch (e) {
-      print("Error Get Information: $e");
+      print("Get Historic (Home Repository) Error: $e");
     }
   }
 
-  getChartPorMinute() async {
+  Future<List<DataLineGraph>?> getHistoricAllActions(bool active) async {
+    print(active);
+    clientDio.options.contentType = Headers.jsonContentType;
+    Map<String, String> data = {"nomeCarteira": ""};
     try {
-      final response = await clientDio.get('${url}valueminutegraph');
-      List list = response.data as List;
-      return list.map((json) => ValueMinutesGraph.fromJson(json)).toList();
+      final response = await clientDio.get("https://g6b.online/api/Ativos/relatorio-todos-ativos?paridadeRiscos=$active");
+      final list = response.data["data"] as List;
+      return list.map((json) => DataLineGraph.fromJson(json)).toList();
     } catch (e) {
-      print("Error Get Information: $e");
+      print("Get Historic (Home Repository) Error: $e");
     }
   }
 }

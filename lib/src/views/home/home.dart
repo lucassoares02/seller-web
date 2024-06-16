@@ -1,20 +1,17 @@
 import 'package:auto_route/annotations.dart';
-import 'package:profair/provider/appwriter.dart';
+import 'package:profair/src/components/dropdownbutton.dart';
+import 'package:profair/src/components/loading_dash.dart';
 import 'package:profair/src/components/progress_indicator.dart';
+import 'package:profair/src/components/side_menu.dart';
+import 'package:profair/src/state/state_app.dart';
 import 'package:profair/src/utils/spacing.dart';
 import 'package:profair/src/views/home/components/card_charts.dart';
 import 'package:profair/src/views/home/components/card_welcome.dart';
-import 'package:profair/src/views/home/components/categories.dart';
-import 'package:profair/src/views/home/components/last_requests.dart';
-import 'package:profair/src/views/home/components/notices.dart';
 import 'package:profair/src/views/home/home_controller.dart';
-import 'package:profair/src/components/loading_list.dart';
 import 'package:profair/src/components/spacing.dart';
-import 'package:profair/src/state/state_app.dart';
-import 'package:profair/generated/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:skeletons/skeletons.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 @RoutePage()
 class HomePage extends StatefulWidget {
@@ -30,22 +27,28 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     homeController = Provider.of<HomeController>(context, listen: false);
-    homeController!.findNotices();
-    homeController!.findInformationHome();
-    homeController!.findChartPorMinute();
-    homeController!.findChart();
-
+    getPreferences();
     super.initState();
+  }
+
+  getPreferences() async {
+    SharedPreferences sharePref = await SharedPreferences.getInstance();
+    String? drop = sharePref.getString("valuedrop");
+    homeController!.findActives();
+    homeController!.findDetails(drop == "true");
+    homeController!.findHistoric(drop == "true");
+    homeController!.findHistoricAllActions(drop == "true");
   }
 
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     return Scaffold(
-      backgroundColor: Colors.grey[100],
       body: SafeArea(
-        child: Column(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            SideMenu(),
             Expanded(
               child: SingleChildScrollView(
                 child: Column(
@@ -54,92 +57,39 @@ class _HomePageState extends State<HomePage> {
                     const AppSpacing(),
                     const AppSpacing(),
                     const AppSpacing(),
-                    CardWelcome(homeController: homeController!),
-                    CardCharts(homeController: homeController!),
-                    // ValueListenableBuilder(
-                    //     valueListenable: homeController!.stateInformation,
-                    //     builder: (context, value, child) {
-                    //       return value == StateApp.loading ? LoadingDash() : CardCharts(homeController: homeController);
-                    //     }),
-                    // ValueListenableBuilder(
-                    //     valueListenable: homeController!.stateNoticesAppWrite,
-                    //     builder: (context, value, child) {
-                    //       return value == StateApp.loading
-                    //           ? Container(
-                    //               margin: const EdgeInsets.symmetric(horizontal: appPadding),
-                    //               child: SkeletonAvatar(
-                    //                 style: SkeletonAvatarStyle(height: 300, width: width, borderRadius: BorderRadius.circular(10)),
-                    //               ),
-                    //             )
-                    //           : CardNotice(homeController: homeController);
-                    //     }),
-                    // CardCount(homeController: homeController),
-                    // const AppSpacing(),
-                    // AppActions(homeController: homeController),
-                    // const AppSpacing(),
-                    const AppSpacing(),
-                    // Container(
-                    //   padding: const EdgeInsets.symmetric(horizontal: appPadding),
-                    //   child: ValueListenableBuilder(
-                    //       valueListenable: homeController!.stateData,
-                    //       builder: (context, value, child) {
-                    //         return value == StateApp.loading
-                    //             ? Row(
-                    //                 children: [1, 2, 3, 4, 5].map((e) {
-                    //                 return Flexible(
-                    //                   flex: 1,
-                    //                   child: Row(
-                    //                     children: [
-                    //                       if (e != 1) const AppSpacing(),
-                    //                       Expanded(
-                    //                         child: SkeletonAvatar(
-                    //                           style: SkeletonAvatarStyle(height: 150, borderRadius: BorderRadius.circular(10)),
-                    //                         ),
-                    //                       ),
-                    //                     ],
-                    //                   ),
-                    //                 );
-                    //               }).toList())
-                    //             : homeController!.data!.accessTargeting == 3
-                    //                 ? Column(
-                    //                     children: [
-                    //                       Categories(homeController: homeController!),
-                    //                     ],
-                    //                   )
-                    //                 : Container();
-                    //       }),
-                    // ),
-                    // const AppSpacing(),
-                    // const AppSpacing(),
-                    // ValueListenableBuilder(
-                    //   valueListenable: homeController!.stateAlert,
-                    //   builder: (context, value, child) {
-                    //     return value == StateApp.loading
-                    //         ? AppProgressIndicator()
-                    //         : Notices(
-                    //             listItems: homeController!.alerts!,
-                    //             state: homeController!.stateAlert,
-                    //             title: S.of(context).text_notifications,
-                    //             cardHeigth: 90,
-                    //             cardWidth: 340,
-                    //           );
-                    //   },
-                    // ),
+                    CardWelcome(),
+                    Padding(
+                      padding: const EdgeInsets.all(appPadding),
+                      child: Row(
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const AppSpacing(),
+                              const Text(
+                                "Selecione a carteira",
+                                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                              const AppSpacing(),
+                              AppDropDownButton(function: (value) {
+                                homeController!.findActives();
+                                homeController!.findDetails(value == "true");
+                                homeController!.findHistoric(value == "true");
+                                homeController!.findHistoricAllActions(value == "true");
+                              }),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
                     const AppSpacing(),
                     ValueListenableBuilder(
-                      valueListenable: homeController!.stateData,
-                      builder: (context, value, child) {
-                        return value == StateApp.loading
-                            ? LoadingList(loadingHeader: false)
-                            : homeController!.data!.accessTargeting == 1
-                                ? LastRequests(
-                                    description: S.of(context).text_last_orders,
-                                    listItems: homeController!.requestStores,
-                                    state: homeController!.stateRequestsStore,
-                                  )
-                                : Container();
-                      },
-                    )
+                        valueListenable: homeController!.stateDetails,
+                        builder: (context, value, child) {
+                          return value == StateApp.loading ? LoadingDash() : CardCharts(homeController: homeController!);
+                        }),
+                    const AppSpacing(),
+                    const AppSpacing(),
                   ],
                 ),
               ),

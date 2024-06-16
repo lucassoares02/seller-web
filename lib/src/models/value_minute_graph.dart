@@ -1,20 +1,21 @@
-class ValueMinutesGraph {
-  String? hour;
-  double? value;
+class DataLineGraph {
+  String? data;
+  double? close;
+  int? id;
 
-  ValueMinutesGraph({this.hour, this.value});
+  DataLineGraph({this.id, this.data, this.close});
 
-  ValueMinutesGraph.fromJson(Map<String, dynamic> json) {
-    // codeBranch = json['codAssocRelaciona'];
-    hour = json['hour'];
-    value = json['value'];
+  DataLineGraph.fromJson(Map<String, dynamic> json) {
+    id = json['ativoId'];
+    data = json['dataHora'];
+    close = json['rendimentoDiario'] ?? json['close'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    // data['codAssocRelaciona'] = codeBranch;
-    data['hour'] = hour;
-    data['value'] = value;
+    data['AtivoId'] = id;
+    data['data'] = data;
+    data['close'] = close;
     return data;
   }
 }

@@ -33,7 +33,7 @@ dependencies:
   firebase_core: ^2.15.1
   firebase_messaging: ^14.6.6
   appwrite: ^9.0.0
-  flutter_svg: ^2.0.7
+  flutter_svg: ^2.0.9
   auto_route: ^7.8.1
   animated_flip_counter: ^0.2.6
   csv: ^5.0.2
@@ -42,6 +42,7 @@ dependencies:
   qr_flutter: ^4.1.0
   printing: ^5.11.0
   pdf: ^3.10.4
+  intl: ^0.18.1
 
 dev_dependencies:
   auto_route_generator: ^7.3.1
